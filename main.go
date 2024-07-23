@@ -2,12 +2,13 @@ package main
 
 import (
 	"encoding/json"
-	"log"
+	"fmt"
 	"net/http"
 	"os"
 	"strings"
-	"sync"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/nats-io/nats.go"
 	"github.com/nats-io/nats.go/micro"
@@ -73,10 +74,10 @@ func main() {
 
 	msg, _ = nc.Request("minmax.max", requestData, 2*time.Second)
 	result = decode(msg)
-	log.Printf("Requested max value, got %d\n", result.Max)
+	// log.Printf("Requested max value, got %d\n", result.Max)
 
-	log.Printf("Endpoint '%s' requests: %d\n", srv.Stats().Endpoints[0].Name, srv.Stats().Endpoints[0].NumRequests)
-	log.Printf("Endpoint '%s' requests: %d\n", srv.Stats().Endpoints[1].Name, srv.Stats().Endpoints[1].NumRequests)
+	// log.Printf("Endpoint '%s' requests: %d\n", srv.Stats().Endpoints[0].Name, srv.Stats().Endpoints[0].NumRequests)
+	// log.Printf("Endpoint '%s' requests: %d\n", srv.Stats().Endpoints[1].Name, srv.Stats().Endpoints[1].NumRequests)
 
 	// sub, err := nc.Subscribe("example-nestjs.hello.get", func(msg *nats.Msg) {
 
@@ -103,31 +104,84 @@ func main() {
 	// }
 
 	// Use a WaitGroup to wait for a message to arrive
-	wg := sync.WaitGroup{}
-	wg.Add(1)
 
 	// Subscribe
 	response := Response{
 		Payload: Payload{
 			Type:   []string{"info"},
 			Status: http.StatusOK,
-			Data:   "asd",
+			Data:   "asdasdsadsadsa",
 		},
 	}
 
+	// Struct for unmarshalling JSON data
+	type Pattern struct {
+		Service  string `json:"service"`
+		Endpoint string `json:"endpoint"`
+		Method   string `json:"method"`
+	}
+
+	type Params struct {
+		Name string `json:"name"`
+	}
+
+	type Data struct {
+		Headers       map[string]interface{} `json:"headers"`
+		Authorization map[string]interface{} `json:"authorization"`
+		Params        Params                 `json:"params"`
+		Payload       map[string]interface{} `json:"payload"`
+	}
+
+	type JSONData struct {
+		Pattern Pattern `json:"pattern"`
+		Data    Data    `json:"data"`
+		ID      string  `json:"id"`
+	}
+
+	var jsonData JSONData
+	/*
+		{
+		  "pattern": {
+		    "service": "example-nestjs",
+		    "endpoint": "hello",
+		    "method": "GET"
+		  },
+		  "data": {
+		    "headers": {},
+		    "authorization": {},
+		    "params": {
+		      "name": "hai"
+		    },
+		    "payload": {}
+		  },
+		  "id": "5cb26e8dfd533783314c4"
+		}
+	*/
 	if _, err := nc.Subscribe(`{"endpoint":"hello","method":"GET","service":"example-nestjs"}`, func(m *nats.Msg) {
 
 		message, _ := json.Marshal(response)
 		m.Respond(message)
-		log.Printf(string(message))
+		//log.Printf(string(message))
+		a := json.Unmarshal(m.Data, &jsonData)
+		if a != nil {
+			log.Fatal(a)
+		} else {
+			fmt.Println("m.Subject: ", m.Subject)
+			fmt.Println("m.Reply: ", m.Reply)
+			fmt.Println("m.Header: ")
+			for k, v := range m.Header {
+				fmt.Println(k, "value is", v)
+			}
 
-		wg.Done()
+			fmt.Println(jsonData.Data.Params)
+		}
+
 	}); err != nil {
 		log.Fatal(err)
 	}
 
 	// Wait for a message to come in
-	wg.Wait()
+	select {}
 }
 
 func handleMin(req micro.Request) {
