@@ -13,8 +13,8 @@ export class EventModuleController {
         endpoint: 'register',
         method: 'POST'
     })
-    async createBrand(@Payload() message: MessageContextDto){
-        console.log("Register Event",message.payload)
+    async createEvent(@Payload() message: MessageContextDto){
+        console.log("Register Event: ", message.payload);
         if (!message.payload.brand_id || !message.payload.event_name || !message.payload.event_image || !message.payload.voucher_quantity || !message.payload.start_date || !message.payload.end_date) {
             return {
                 payload: {
@@ -24,15 +24,16 @@ export class EventModuleController {
                 }
             }
         }
-        const event_param = new CreateEventDTO()
-        event_param.brand_id = message.payload.brand_id
-        event_param.event_name = message.payload.event_name
-        event_param.event_image = message.payload.event_image
-        event_param.voucher_quantity = message.payload.voucher_quantity
-        event_param.start_date = message.payload.start_date
-        event_param.end_date = message.payload.end_date
+
+        const event_param = new CreateEventDTO();
+        event_param.brand_id = message.payload.brand_id;
+        event_param.event_name = message.payload.event_name;
+        event_param.event_image = message.payload.event_image;
+        event_param.voucher_quantity = message.payload.voucher_quantity;
+        event_param.start_date = message.payload.start_date;
+        event_param.end_date = message.payload.end_date;
         
-        const data = await this.event_service.createEvent(event_param)
+        const data = await this.event_service.createEvent(event_param);
         if (data) {
             return {
                 payload: {
@@ -50,10 +51,23 @@ export class EventModuleController {
                 }
             }
         }
-        // const data = null
-        
     }
 
+    @MessagePattern({
+        service: 'event-manage',
+        endpoint: 'hello',
+        method: 'GET'
+    })
+    helloRespond(@Payload() message: MessageContextDto) {
+        console.log("Message: ", message)
+        return {
+            payload: {
+                type: ['info'],
+                status: HttpStatus.CREATED,
+                data: "Hello"
+            }
+        }
+    }
     // Subscriber
     @EventPattern('some.subject') // Adjust the subject to match your use case
     handleIncomingMessage(data: any) {

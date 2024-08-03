@@ -19,16 +19,18 @@ export class EventModuleService {
     }
 
     async getEventById(eventId: string): Promise<Event> {
-        return this.eventRepository.findOne({ _id: new Types.ObjectId(eventId)})
+        return this.eventRepository.findOne({ _id: new Types.ObjectId(eventId) })
     }
 
-    async getEventByBrandId(brand_id: string): Promise<Event[]> {
-        return this.eventRepository.find({ _id: new Types.ObjectId(brand_id)})
+    async getEventByBrandId_EventName(brand_id: Types.ObjectId, event_name: string): Promise<Event> {
+        return this.eventRepository.findOne({ brand_id, event_name })
     }
 
     async createEvent(createEventDTO: CreateEventDTO): Promise<Event> {
-        const {  brand_id, event_name, event_image, voucher_quantity, start_date, end_date} = createEventDTO
-        return this.eventRepository.create({
+        const { brand_id, event_name, event_image, voucher_quantity, start_date, end_date } = createEventDTO
+        const exist_event = await this.getEventByBrandId_EventName(brand_id, event_name)
+        // If exist, return it or create new one
+        return exist_event ? exist_event :this.eventRepository.create({
             brand_id, event_name, event_image, voucher_quantity, start_date, end_date
         })
     }
