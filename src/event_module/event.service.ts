@@ -5,6 +5,7 @@ import { natsConfig } from 'config/nats.config';
 import { Types } from 'mongoose';
 import { Event } from './Schemas/event.schema';
 import { CreateEventDTO } from './dtos/create-event.dto';
+import { EditEventDTO } from './dtos/edit-event.dto';
 
 @Injectable()
 export class EventModuleService {
@@ -33,6 +34,17 @@ export class EventModuleService {
         return exist_event ? exist_event :this.eventRepository.create({
             brand_id, event_name, event_image, voucher_quantity, start_date, end_date
         })
+    }
+
+    async editEvent(editEventDTO: EditEventDTO): Promise<Event> {
+        const update_query = {};
+        for (const key in editEventDTO) {
+        if (editEventDTO[key] !== undefined) {
+            update_query[key] = editEventDTO[key];
+        }
+        }
+        const filter_query = { "_id": new Types.ObjectId(editEventDTO._id)}
+        return this.eventRepository.findOneAndUpdate(filter_query, update_query)
     }
 
     async getEventList(): Promise<Event[]> {
