@@ -99,7 +99,7 @@ export class EventModuleController {
             }
         }
     }
-
+    
     @MessagePattern({
         service: 'event-manage',
         endpoint: 'hello',
@@ -112,6 +112,22 @@ export class EventModuleController {
                 type: ['info'],
                 status: HttpStatus.CREATED,
                 data: "Hello"
+            }
+        }
+    }
+
+    @MessagePattern({
+        service: 'event-manage',
+        endpoint: 'all-event',
+        method: 'GET'
+    })
+    async getAllEvent() {
+        const data = await this.event_service.getEventList();
+        return {
+            payload: {
+                type: ['info'],
+                status: HttpStatus.OK,
+                data: data ? data : "No data"
             }
         }
     }
