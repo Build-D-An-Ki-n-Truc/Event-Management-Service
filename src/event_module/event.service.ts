@@ -28,11 +28,11 @@ export class EventModuleService {
     }
 
     async createEvent(createEventDTO: CreateEventDTO): Promise<Event> {
-        const { brand_id, event_name, event_image, voucher_quantity, start_date, end_date } = createEventDTO
+        const { brand_id, event_name, event_image, voucher_quantity, start_date, end_date, description } = createEventDTO
         const exist_event = await this.getEventByBrandId_EventName(brand_id, event_name)
         // If exist, return it or create new one
         return exist_event ? exist_event :this.eventRepository.create({
-            brand_id, event_name, event_image, voucher_quantity, start_date, end_date
+            brand_id, event_name, event_image, voucher_quantity, start_date, end_date, description
         })
     }
 

@@ -4,6 +4,7 @@ import { Type } from 'class-transformer';
 
 export class CreateEventDTO {
     brand_id: Types.ObjectId;
+    description: string;
     event_name: string;
     event_image: string;
     voucher_quantity: number = 0;

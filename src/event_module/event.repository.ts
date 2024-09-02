@@ -22,6 +22,6 @@ export class EventsRepository {
     }
 
     async findOneAndUpdate(filterQuery: FilterQuery<Event>, event: Partial<Event>): Promise<Event> {
-        return this.eventModel.findOneAndUpdate(filterQuery, event);
+        return this.eventModel.findOneAndUpdate(filterQuery, event, {new: true});
     }
 }

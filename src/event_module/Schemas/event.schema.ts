@@ -22,6 +22,9 @@ export class Event {
 
     @Prop({ required: true, default: Date.now })
     end_date: Date;
+
+    @Prop()
+    description: string;
 }
 
 export const EventSchema = SchemaFactory.createForClass(Event)
