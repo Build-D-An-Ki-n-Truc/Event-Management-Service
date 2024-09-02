@@ -1,8 +1,8 @@
 # API Doc
 - Get Single Event ( Pass id to query param )
-  - CURL: curl --location 'http://localhost:3000/event-manage/event_id?id=66d4711adc6953d9a5b14c8d'
+  - CURL: `curl --location 'http://localhost:3000/event-manage/event_id?id=66d4711adc6953d9a5b14c8d'`
 - Get All Event
-  - CURL: curl --location 'http://localhost:3000/event-manage/all-event'
+  - CURL: `curl --location 'http://localhost:3000/event-manage/all-event'`
     
 - Edit Event ( _id and brand_id is required )
   - CURL: `curl --location --request PATCH 'http://localhost:3000/event-manage/edit' \
