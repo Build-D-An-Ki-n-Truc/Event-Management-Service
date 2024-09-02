@@ -71,7 +71,7 @@ export class EventModuleController {
             }
         }
 
-        const event_param = new EditEventDTO();
+        const event_param = new EditEventDTO(); 
         event_param.brand_id = message.payload.brand_id;
         event_param._id = message.payload._id;
         event_param.event_name = message.payload.event_name;
@@ -79,6 +79,7 @@ export class EventModuleController {
         event_param.voucher_quantity = message.payload.voucher_quantity;
         event_param.start_date = message.payload.start_date;
         event_param.end_date = message.payload.end_date;
+        event_param.description = message.payload.description;
         
         const data = await this.event_service.editEvent(event_param);
         if (data) {
@@ -112,6 +113,32 @@ export class EventModuleController {
                 type: ['info'],
                 status: HttpStatus.CREATED,
                 data: "Hello"
+            }
+        }
+    }
+
+    @MessagePattern({
+        service: 'event-manage',
+        endpoint: 'event_id',
+        method: 'GET'
+    })
+    async getBrandById(@Payload() message: MessageContextDto) {
+        console.log(message);
+        if (!message.params.id) {
+            return {
+                payload: {
+                    type: ['info'],
+                    status: HttpStatus.BAD_REQUEST,
+                    data: "Missing param"
+                }
+            }
+        }
+        const data = await this.event_service.getEventById(message.params.id)
+        return {
+            payload: {
+                type: ['info'],
+                status: HttpStatus.OK,
+                data: data ? data : "No data"
             }
         }
     }

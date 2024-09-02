@@ -7,6 +7,7 @@ export class EditEventDTO {
     _id: Types.ObjectId;
     event_name: string;
     event_image: string;
+    description: string;
     voucher_quantity: number = 0;
 
     @IsDate()
