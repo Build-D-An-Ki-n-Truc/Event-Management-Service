@@ -23,16 +23,28 @@ export class EventModuleService {
         return this.eventRepository.findOne({ _id: new Types.ObjectId(eventId) })
     }
 
+    async getEventByIds(eventIds: Array<string>): Promise<Event[]> {
+        console.log("Ids: ", eventIds)
+        const converted_event_ids = eventIds.map(id => {
+            return new Types.ObjectId(id);
+        })
+        return this.eventRepository.find({ _id: {$in: converted_event_ids} })
+    }
+
     async getEventByBrandId_EventName(brand_id: Types.ObjectId, event_name: string): Promise<Event> {
         return this.eventRepository.findOne({ brand_id, event_name })
     }
 
     async createEvent(createEventDTO: CreateEventDTO): Promise<Event> {
-        const { brand_id, event_name, event_image, voucher_quantity, start_date, end_date, description } = createEventDTO
+        const { brand_id, event_name, event_image, voucher_quantity, start_date, end_date, description, voucher_condition } = createEventDTO
         const exist_event = await this.getEventByBrandId_EventName(brand_id, event_name)
         // If exist, return it or create new one
         return exist_event ? exist_event :this.eventRepository.create({
-            brand_id, event_name, event_image, voucher_quantity, start_date, end_date, description
+            brand_id, event_name, event_image, voucher_quantity, start_date, end_date, description, voucher_condition: voucher_condition ? voucher_condition :{
+                shoe: 3,
+                book: 4,
+                coin: 5
+            }
         })
     }
 

@@ -31,6 +31,7 @@ export class EventModuleController {
         event_param.event_name = message.payload.event_name;
         event_param.event_image = message.payload.event_image;
         event_param.voucher_quantity = message.payload.voucher_quantity;
+        event_param.voucher_condition = message.payload.voucher_condition;
         event_param.start_date = message.payload.start_date;
         event_param.end_date = message.payload.end_date;
         
@@ -77,6 +78,7 @@ export class EventModuleController {
         event_param.event_name = message.payload.event_name;
         event_param.event_image = message.payload.event_image;
         event_param.voucher_quantity = message.payload.voucher_quantity;
+        event_param.voucher_condition = message.payload.voucher_condition;
         event_param.start_date = message.payload.start_date;
         event_param.end_date = message.payload.end_date;
         event_param.description = message.payload.description;
@@ -122,7 +124,7 @@ export class EventModuleController {
         endpoint: 'event_id',
         method: 'GET'
     })
-    async getBrandById(@Payload() message: MessageContextDto) {
+    async getEventById(@Payload() message: MessageContextDto) {
         console.log(message);
         if (!message.params.id) {
             return {
@@ -134,6 +136,31 @@ export class EventModuleController {
             }
         }
         const data = await this.event_service.getEventById(message.params.id)
+        return {
+            payload: {
+                type: ['info'],
+                status: HttpStatus.OK,
+                data: data ? data : "No data"
+            }
+        }
+    }
+
+    @MessagePattern({
+        service: 'event-manage',
+        endpoint: 'event_ids',
+        method: 'GET'
+    })
+    async getEventIds(@Payload() message: MessageContextDto) {
+        if (!message.params.ids) {
+            return {
+                payload: {
+                    type: ['info'],
+                    status: HttpStatus.BAD_REQUEST,
+                    data: "Missing param"
+                }
+            }
+        }
+        const data = await this.event_service.getEventByIds(JSON.parse(message.params.ids))
         return {
             payload: {
                 type: ['info'],

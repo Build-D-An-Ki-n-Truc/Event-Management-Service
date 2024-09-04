@@ -8,6 +8,7 @@ export class CreateEventDTO {
     event_name: string;
     event_image: string;
     voucher_quantity: number = 0;
+    voucher_condition: Record<string, any>;
 
     @IsDate()
     @Type(() => Date)

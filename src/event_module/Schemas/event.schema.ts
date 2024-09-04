@@ -17,6 +17,9 @@ export class Event {
     @Prop()
     voucher_quantity: number;
 
+    @Prop({ type: Object }) 
+    voucher_condition: Record<string, any>; 
+
     @Prop({ required: true, default: Date.now })
     start_date: Date;
 
