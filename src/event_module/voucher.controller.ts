@@ -1,41 +1,40 @@
 import { Controller, HttpStatus } from '@nestjs/common';
-import { EventModuleService } from './event.service';
 import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
 import { MessageContextDto } from './dtos/message.dto';
-import { CreateEventDTO } from './dtos/create-event.dto';
-import { EditEventDTO } from './dtos/edit-event.dto';
+import { VoucherModuleService } from './voucher.service';
+import { CreateVoucherDTO } from './dtos/create-voucher.dto';
+import { EditVoucherDTO } from './dtos/edit-voucher.dto';
 
 @Controller('event-module')
-export class EventModuleController {
-    constructor(private readonly event_service: EventModuleService) {}
+export class VoucherModuleController {
+    constructor(private readonly voucher_service: VoucherModuleService) {}
 
     @MessagePattern({
-        service: 'event-manage',
+        service: 'voucher-manage',
         endpoint: 'register',
         method: 'POST'
     })
-    async createEvent(@Payload() message: MessageContextDto){
-        console.log("Register Event: ", message.payload);
-        if (!message.payload.brand_id || !message.payload.event_name || !message.payload.event_image || !message.payload.voucher_quantity || !message.payload.start_date || !message.payload.end_date) {
+    async createVoucher(@Payload() message: MessageContextDto){
+        console.log("Register Voucher: ", message.payload);
+        if (!message.payload.event_id || !message.payload.qr_code || !message.payload.value || !message.payload.description || !message.payload.expiration_date || !message.payload.status) {
             return {
                 payload: {
                     type: ['info'],
                     status: HttpStatus.BAD_REQUEST,
-                    data: "Missing params in [brand_id, event_name, event_image, voucher_quantity, start_date, end_date]"
+                    data: "Missing params in [event_id, online, qr_code, value, description, expiration_date, status]"
                 }
             }
         }
 
-        const event_param = new CreateEventDTO();
-        event_param.brand_id = message.payload.brand_id;
-        event_param.event_name = message.payload.event_name;
-        event_param.event_image = message.payload.event_image;
-        event_param.voucher_quantity = message.payload.voucher_quantity;
-        event_param.voucher_condition = message.payload.voucher_condition;
-        event_param.start_date = message.payload.start_date;
-        event_param.end_date = message.payload.end_date;
+        const voucher_param = new CreateVoucherDTO();
+        voucher_param.event_id = message.payload.event_id;
+        voucher_param.qr_code = message.payload.qr_code;
+        voucher_param.value = message.payload.value;
+        voucher_param.description = message.payload.description;
+        voucher_param.expiration_date = message.payload.expiration_date;
+        voucher_param.status = message.payload.status;
         
-        const data = await this.event_service.createEvent(event_param);
+        const data = await this.voucher_service.createVoucher(voucher_param);
         if (data) {
             return {
                 payload: {
@@ -49,41 +48,41 @@ export class EventModuleController {
                 payload: {
                     type: ['error'],
                     status: HttpStatus.INTERNAL_SERVER_ERROR,
-                    data: "Can't register this event"
+                    data: "Can't register this voucher"
                 }
             }
         }
     }
 
     @MessagePattern({
-        service: 'event-manage',
+        service: 'voucher-manage',
         endpoint: 'edit',
         method: 'PATCH'
     })
-    async editEvent(@Payload() message: MessageContextDto){
-        console.log("Register Event: ", message.payload);
-        if (!message.payload.brand_id || !message.payload._id ) {
+    async editVoucher(@Payload() message: MessageContextDto){
+        console.log("Edit Voucher: ", message.payload);
+        if (!message.payload.event_id || !message.payload._id ) {
             return {
                 payload: {
                     type: ['info'],
                     status: HttpStatus.BAD_REQUEST,
-                    data: "Missing params in [brand_id, event_id]"
+                    data: "Missing params in [event_id, event_id]"
                 }
             }
         }
 
-        const event_param = new EditEventDTO(); 
-        event_param.brand_id = message.payload.brand_id;
-        event_param._id = message.payload._id;
-        event_param.event_name = message.payload.event_name;
-        event_param.event_image = message.payload.event_image;
-        event_param.voucher_quantity = message.payload.voucher_quantity;
-        event_param.voucher_condition = message.payload.voucher_condition;
-        event_param.start_date = message.payload.start_date;
-        event_param.end_date = message.payload.end_date;
-        event_param.description = message.payload.description;
+        const voucher_param = new EditVoucherDTO(); 
+        voucher_param.event_id = message.payload.event_id;
+        voucher_param._id = message.payload._id;
+        voucher_param.qr_code = message.payload.qr_code;
+        voucher_param.online = message.payload.online;
+        voucher_param.value = message.payload.value;
+        voucher_param.description = message.payload.description;
+        voucher_param.status = message.payload.status;
+        voucher_param.expiration_date = message.payload.expiration_date;
         
-        const data = await this.event_service.editEvent(event_param);
+        console.log(voucher_param)
+        const data = await this.voucher_service.editVoucher(voucher_param);
         if (data) {
             return {
                 payload: {
@@ -97,7 +96,7 @@ export class EventModuleController {
                 payload: {
                     type: ['error'],
                     status: HttpStatus.INTERNAL_SERVER_ERROR,
-                    data: "Can't register this event"
+                    data: "Can't change this voucher"
                 }
             }
         }
@@ -105,11 +104,11 @@ export class EventModuleController {
     
 
     @MessagePattern({
-        service: 'event-manage',
-        endpoint: 'event_id',
+        service: 'voucher-manage',
+        endpoint: 'voucher_id',
         method: 'GET'
     })
-    async getEventById(@Payload() message: MessageContextDto) {
+    async getVoucherById(@Payload() message: MessageContextDto) {
         console.log(message);
         if (!message.params.id) {
             return {
@@ -120,7 +119,7 @@ export class EventModuleController {
                 }
             }
         }
-        const data = await this.event_service.getEventById(message.params.id)
+        const data = await this.voucher_service.getVoucherById(message.params.id)
         return {
             payload: {
                 type: ['info'],
@@ -131,11 +130,11 @@ export class EventModuleController {
     }
 
     @MessagePattern({
-        service: 'event-manage',
-        endpoint: 'event_ids',
+        service: 'voucher-manage',
+        endpoint: 'voucher_ids',
         method: 'GET'
     })
-    async getEventIds(@Payload() message: MessageContextDto) {
+    async getVoucherByIds(@Payload() message: MessageContextDto) {
         if (!message.params.ids) {
             return {
                 payload: {
@@ -145,7 +144,7 @@ export class EventModuleController {
                 }
             }
         }
-        const data = await this.event_service.getEventByIds(JSON.parse(message.params.ids))
+        const data = await this.voucher_service.getVoucherByIds(JSON.parse(message.params.ids))
         return {
             payload: {
                 type: ['info'],
@@ -156,12 +155,12 @@ export class EventModuleController {
     }
 
     @MessagePattern({
-        service: 'event-manage',
-        endpoint: 'all-event',
+        service: 'voucher-manage',
+        endpoint: 'all-voucher',
         method: 'GET'
     })
     async getAllEvent() {
-        const data = await this.event_service.getEventList();
+        const data = await this.voucher_service.getVoucherList();
         return {
             payload: {
                 type: ['info'],
