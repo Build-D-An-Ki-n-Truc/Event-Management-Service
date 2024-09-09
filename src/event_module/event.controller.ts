@@ -132,6 +132,32 @@ export class EventModuleController {
 
     @MessagePattern({
         service: 'event-manage',
+        endpoint: 'event_by_name',
+        method: 'GET'
+    })
+    async getEventByBrandId_EventName(@Payload() message: MessageContextDto) {
+        console.log(message);
+        if (!message.params.brand_id || !message.params.event_name) {
+            return {
+                payload: {
+                    type: ['info'],
+                    status: HttpStatus.BAD_REQUEST,
+                    data: "Missing param [brand_id, event_name]" 
+                }
+            }
+        }
+        const data = await this.event_service.getEventByBrandId_EventName(message.params.brand_id, message.params.event_name)
+        return {
+            payload: {
+                type: ['info'],
+                status: HttpStatus.OK,
+                data: data ? data : "No data"
+            }
+        }
+    }
+
+    @MessagePattern({
+        service: 'event-manage',
         endpoint: 'event_ids',
         method: 'GET'
     })
